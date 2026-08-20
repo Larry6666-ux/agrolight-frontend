@@ -115,7 +115,7 @@ export default function AgroLightPrototype() {
   const [data, setData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
  
-const [activeEndpointData, setActiveEndpointData] = useState(null);
+  const [activeEndpointData, setActiveEndpointData] = useState(null);
 
   const [tab, setTab] = useState("home");
   const [screen, setScreen] = useState(null);
