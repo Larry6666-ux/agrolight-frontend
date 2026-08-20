@@ -300,9 +300,9 @@ export default function AgroLightPrototype() {
     return <FullScreenNote icon={Loader2} spin text="Loading your farm data…" />;
   }
 
-  const ctx = { apiBase, token, user, data, refreshAll, showToast, buyerFetch: getBuyerSession };
+  
 
-  return (
+ return(
     <div className="w-full min-h-screen flex items-start justify-center py-8 px-4" style={{ background: BRAND.paper, fontFamily: "'Inter', system-ui, sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
