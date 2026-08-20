@@ -527,19 +527,15 @@ function HomeTab({ ctx, openScreen, goToTab }) {
         } else {
           setActiveEndpointData({ title: item.label, error: "Status " + res.status + ": " + res.statusText });
         }
-      } catch (e) {
-        setActiveEndpointData({ title: item.label, error: e.message });
-      }
-           {/* Quick Action Endpoints Bar */}
+   {/* Quick Action Endpoints Bar */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
         {[
           { label: 'Market Prices', path: '/api/market-prices' },
           { label: 'Farm Locations', path: '/api/farms' },
           { label: 'Solar Hardware', path: '/api/hardware' },
           { label: 'Copilot Chat Test', path: '/api/copilot', method: 'POST' },
           { label: 'Analytics Summary', path: '/api/analytics' },
-       ].map((item, index) => (
+        ].map((item, index) => (
           <button
             key={index}
             onClick={async () => {
@@ -567,7 +563,8 @@ function HomeTab({ ctx, openScreen, goToTab }) {
           </button>
         ))}
       </div>
-     className="px-4 grid grid-cols-3 gap-2 mt-3">
+
+      <div className="px-4 grid grid-cols-3 gap-2 mt-3">
         <MiniStat emoji="🌾" label="Produce Value" value={`₦${(produceValue / 1000).toFixed(0)}k`} color={BRAND.green} />
         <MiniStat emoji="📦" label="Pending Orders" value={pendingOrders} color={BRAND.blue} />
         <MiniStat emoji="💰" label="Wallet Balance" value={`₦${(Number(data.wallet.balance) / 1000).toFixed(1)}k`} color="#8A6A0F" />
