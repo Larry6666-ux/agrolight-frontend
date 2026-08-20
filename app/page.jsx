@@ -115,8 +115,8 @@ export default function AgroLightPrototype() {
   const [data, setData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
  
-  const [activeEndpointData, setActiveEndpointData] = useState(null);
-  const [loginInput, setLoginInput] = useState("");
+const [activeEndpointData, setActiveEndpointData] = useState(null);
+
   const [tab, setTab] = useState("home");
   const [screen, setScreen] = useState(null);
   const [adminMode, setAdminMode] = useState(false);
@@ -148,32 +148,6 @@ export default function AgroLightPrototype() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "sans-serif", padding: "20px" }}>
-        <div style={{ background: "white", padding: "30px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", width: "100%", maxWidth: "400px", textAlign: "center" }}>
-          <h2 style={{ color: "#065f46", marginBottom: "8px" }}>🌱 AgroLight OS</h2>
-          <p style={{ color: "#4b5563", fontSize: "14px", marginBottom: "24px" }}>Enter any details to access your workspace</p>
-          
-          <input 
-            type="text" 
-            placeholder="Type any name or details..." 
-            value={loginInput}
-            onChange={(e) => setLoginInput(e.target.value)}
-            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "16px", fontSize: "14px", boxSizing: "border-box" }}
-          />
-          
-          <button 
-            onClick={() => {
-              setUser({ name: loginInput || "Demo Farmer", email: "farmer@agrolight.demo" });
-            }}
-            style={{ width: "100%", padding: "12px", background: "#059669", color: "white", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "14px", cursor: "pointer" }}
-          >
-            Login / Register Demo
-          </button>
-        </div>
-      </div>
-    );
-  }
   async function tryRestore(base, tok, cachedUser) {
     try {
       await apiFetch(base, tok, "/api/farmers/farms");
@@ -288,20 +262,22 @@ export default function AgroLightPrototype() {
     return login;
   }
 
-if (conn.status === "loading") {
-    return <FullScreenNote icon={Loader2} spin text="Checking for a saved connection..." />
+  if (conn.status === "loading") {
+    return <FullScreenNote icon={Loader2} spin text="Checking for a saved connection…" />;
   }
 
   if (conn.status !== "connected") {
-    return <ConnectScreen apiBase={apiBase} setApiBase={setApiBase} status={conn.status} errMsg={conn.errorMessage} onConnect={conn.retry} />
+    return <ConnectScreen apiBase={apiBase} setApiBase={setApiBase} status={conn.status} errorMsg={errorMsg} onConnect={connect} />;
   }
 
   if (!data) {
-    return <FullScreenNote icon={Loader2} spin text="Loading your farm data..." />
+    return <FullScreenNote icon={Loader2} spin text="Loading your farm data…" />;
   }
 
+  const ctx = { apiBase, token, user, data, refreshAll, showToast, buyerFetch: getBuyerSession };
+
   return (
-    <div className="w-full min-h-screen flex items-start justify-center py-8 px-4 bg-slate-50">
+    <div className="w-full min-h-screen flex items-start justify-center py-8 px-4" style={{ background: BRAND.paper, fontFamily: "'Inter', system-ui, sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
         .agro-display { font-family: 'Space Grotesk', system-ui, sans-serif; }
@@ -1436,34 +1412,6 @@ function AdminDashboard({ adminData, onExit }) {
         ))}
         {adminData.users.length === 0 && <EmptyState icon={Users} text="No users registered on this backend yet." />}
       </div>
-   
-  );
-}
-   function FullScreenNote({ icon: Icon, spin, text }) {
-  return (
-    <div className="w-full min-h-screen flex items-center justify-center p-6 bg-slate-50">
-      <div className="flex flex-col items-center gap-3 text-center max-w-sm">
-        {Icon && <Icon className={w-8 h-8 text-emerald-600 ${spin ? "animate-spin" : ""}} />}
-        <p className="text-sm font-medium text-slate-700">{text}</p>
-      </div>
     </div>
   );
 }
-
-function ConnectScreen({ apiBase, setApiBase, status, errMsg, onConnect }) {
-  return (
-    <div className="w-full min-h-screen flex items-center justify-center p-6 bg-slate-50">
-      <div className="flex flex-col items-center gap-4 text-center max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-        <h2 className="text-lg font-bold text-slate-900">AgroLight OS Connection</h2>
-        <p className="text-xs text-slate-500">Status: {status}</p>
-        {errMsg && <p className="text-xs text-red-500">{errMsg}</p>}
-        <button
-          onClick={onConnect}
-          className="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition"
-        >
-          Retry Connection
-        </button>
-      </div>
-    </div>
-  );
-}   
