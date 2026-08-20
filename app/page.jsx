@@ -520,51 +520,60 @@ function HomeTab({ ctx, openScreen, goToTab }) {
                   headers: { 'Content-Type': 'application/json' },
                   ...(item.method === 'POST' ? { body: JSON.stringify({ prompt: "Hello AI Copilot" }) } : {})
                 };
-             const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
-        if (res.ok) {
-          const data = await res.json();
-          setActiveEndpointData({ title: item.label, content: data });
-        } else {
-        {/* Quick Action Endpoints Bar */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
-        {[
-          { label: 'Market Prices', path: '/api/market-prices' },
-          { label: 'Farm Locations', path: '/api/farms' },
-          { label: 'Solar Hardware', path: '/api/hardware' },
-          { label: 'Copilot Chat Test', path: '/api/copilot', method: 'POST' },
-          { label: 'Analytics Summary', path: '/api/analytics' },
-        ].map((item, index) => (
-          <button
-            key={index}
-            onClick={async () => {
-              setActiveEndpointData({ title: item.label, content: 'Loading...' });
-              try {
-                const options = {
-                  method: item.method || 'GET',
-                  headers: { 'Content-Type': 'application/json' },
-                  ...(item.method === 'POST' ? { body: JSON.stringify({ data: 'test' }) } : {})
-                };
-                const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
-                if (res.ok) {
-                  const data = await res.json();
-                  setActiveEndpointData({ title: item.label, content: data });
-                } else {
-                  setActiveEndpointData({ title: item.label, error: "Status " + res.status });
-                }
-              } catch (e) {
-                setActiveEndpointData({ title: item.label, error: e.message });
+           const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
+              if (res.ok) {
+                const data = await res.json();
+                setActiveEndpointData({ title: item.label, content: data });
+              } else {
+                setActiveEndpointData({ title: item.label, error: "Status " + res.status });
               }
-            }}
-            style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+            } catch (e) {
+              setActiveEndpointData({ title: item.label, error: e.message });
+            }
+          }}
+          style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
 
-      <div className="px-4 grid grid-cols-3 gap-2 mt-3">
-      </div>
-
+    {/* Quick Action Endpoints Bar */}
+    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+      {[
+        { label: 'Market Prices', path: '/api/market-prices' },
+        { label: 'Farm Locations', path: '/api/farms' },
+        { label: 'Solar Hardware', path: '/api/hardware' },
+        { label: 'Copilot Chat Test', path: '/api/copilot', method: 'POST' },
+        { label: 'Analytics Summary', path: '/api/analytics' },
+      ].map((item, index) => (
+        <button
+          key={index}
+          onClick={async () => {
+            setActiveEndpointData({ title: item.label, content: 'Loading...' });
+            try {
+              const options = {
+                method: item.method || 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                ...(item.method === 'POST' ? { body: JSON.stringify({ data: 'test' }) } : {})
+              };
+              const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
+              if (res.ok) {
+                const data = await res.json();
+                setActiveEndpointData({ title: item.label, content: data });
+              } else {
+                setActiveEndpointData({ title: item.label, error: "Status " + res.status });
+              }
+            } catch (e) {
+              setActiveEndpointData({ title: item.label, error: e.message });
+            }
+          }}
+          style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
       <div className="px-4 grid grid-cols-2 gap-2.5 mt-3">
         <div className="rounded-2xl p-3 bg-white border flex flex-col justify-between" style={{ borderColor: "#EFEFE8" }}>
           <div className="flex items-center gap-1.5"><Sun size={15} color={BRAND.gold} /><span className="text-[10.5px] font-semibold" style={{ color: BRAND.ink }}>Weather Today</span></div>
