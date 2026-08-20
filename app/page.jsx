@@ -539,56 +539,35 @@ function HomeTab({ ctx, openScreen, goToTab }) {
           { label: 'Solar Hardware', path: '/api/hardware' },
           { label: 'Copilot Chat Test', path: '/api/copilot', method: 'POST' },
           { label: 'Analytics Summary', path: '/api/analytics' },
-        ].map((item, index) => (
-      <button
-          onClick={async () => {
-            setActiveEndpointData({ title: item.label, content: 'Loading...' });
-            try {
-              const options = {
-                method: item.method || 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                ...(item.method === 'POST' ? { body: JSON.stringify({ data: 'test' }) } : {})
-              };
-              const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
-              if (res.ok) {
-                const data = await res.json();
-                setActiveEndpointData({ title: item.label, content: data });
-              } else {
-                setActiveEndpointData({ title: item.label, error: "Status " + res.status });
+       ].map((item, index) => (
+          <button
+            key={index}
+            onClick={async () => {
+              setActiveEndpointData({ title: item.label, content: 'Loading...' });
+              try {
+                const options = {
+                  method: item.method || 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                  ...(item.method === 'POST' ? { body: JSON.stringify({ data: 'test' }) } : {})
+                };
+                const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
+                if (res.ok) {
+                  const data = await res.json();
+                  setActiveEndpointData({ title: item.label, content: data });
+                } else {
+                  setActiveEndpointData({ title: item.label, error: "Status " + res.status });
+                }
+              } catch (e) {
+                setActiveEndpointData({ title: item.label, error: e.message });
               }
-            } catch (e) {
-              setActiveEndpointData({ title: item.label, error: e.message });
-            }
-          }}
-          style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
-        >
-          {item.label}
-        </button>
-      ))}
+            }}
+            style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
+          >
+            {item.label}
+          </button>
+        ))}
       </div>
-        <div style={{ background: '#1f2937', color: '#fff', padding: '16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #374151' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h4 style={{ margin: 0, color: '#10b981' }}>{activeEndpointData.title} Result</h4>
-            <button 
-              onClick={() => setActiveEndpointData(null)} 
-              style={{ background: 'transparent', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: '14px' }}
-            >
-              ✕
-            </button>
-          </div>
-          {activeEndpointData.error ? (
-            <p style={{ color: '#ef4444', margin: 0 }}>Error: {activeEndpointData.error}</p>
-          ) : (
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '12px', background: '#111827', padding: '10px', borderRadius: '6px', maxHeight: '200px', overflowY: 'auto' }}>
-              {Array.isArray(activeEndpointData.content) && activeEndpointData.content.length === 0 
-                ? "No record found (0 entries)" 
-                : JSON.stringify(activeEndpointData.content, null, 2)}
-            </pre>
-          )}
-        </div>
-      )}
-
-      <div className="px-4 grid grid-cols-3 gap-2 mt-3">
+     className="px-4 grid grid-cols-3 gap-2 mt-3">
         <MiniStat emoji="🌾" label="Produce Value" value={`₦${(produceValue / 1000).toFixed(0)}k`} color={BRAND.green} />
         <MiniStat emoji="📦" label="Pending Orders" value={pendingOrders} color={BRAND.blue} />
         <MiniStat emoji="💰" label="Wallet Balance" value={`₦${(Number(data.wallet.balance) / 1000).toFixed(1)}k`} color="#8A6A0F" />
