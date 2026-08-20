@@ -288,22 +288,20 @@ export default function AgroLightPrototype() {
     return login;
   }
 
-  if (conn.status === "loading") {
-    return <FullScreenNote icon={Loader2} spin text="Checking for a saved connection…" />;
+if (conn.status === "loading") {
+    return <FullScreenNote icon={Loader2} spin text="Checking for a saved connection..." />
   }
 
   if (conn.status !== "connected") {
-    return <ConnectScreen apiBase={apiBase} setApiBase={setApiBase} status={conn.status} errorMsg={errorMsg} onConnect={connect} />;
+    return <ConnectScreen apiBase={apiBase} setApiBase={setApiBase} status={conn.status} errMsg={conn.errorMessage} onConnect={conn.retry} />
   }
 
   if (!data) {
-    return <FullScreenNote icon={Loader2} spin text="Loading your farm data…" />;
+    return <FullScreenNote icon={Loader2} spin text="Loading your farm data..." />
   }
 
-  
-
- return(
-    <div className="w-full min-h-screen flex items-start justify-center py-8 px-4" style={{ background: BRAND.paper, fontFamily: "'Inter', system-ui, sans-serif" }}>
+  return (
+    <div className="w-full min-h-screen flex items-start justify-center py-8 px-4 bg-slate-50">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
         .agro-display { font-family: 'Space Grotesk', system-ui, sans-serif; }
@@ -1441,3 +1439,31 @@ function AdminDashboard({ adminData, onExit }) {
    
   );
 }
+   function FullScreenNote({ icon: Icon, spin, text }) {
+  return (
+    <div className="w-full min-h-screen flex items-center justify-center p-6 bg-slate-50">
+      <div className="flex flex-col items-center gap-3 text-center max-w-sm">
+        {Icon && <Icon className={w-8 h-8 text-emerald-600 ${spin ? "animate-spin" : ""}} />}
+        <p className="text-sm font-medium text-slate-700">{text}</p>
+      </div>
+    </div>
+  );
+}
+
+function ConnectScreen({ apiBase, setApiBase, status, errMsg, onConnect }) {
+  return (
+    <div className="w-full min-h-screen flex items-center justify-center p-6 bg-slate-50">
+      <div className="flex flex-col items-center gap-4 text-center max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+        <h2 className="text-lg font-bold text-slate-900">AgroLight OS Connection</h2>
+        <p className="text-xs text-slate-500">Status: {status}</p>
+        {errMsg && <p className="text-xs text-red-500">{errMsg}</p>}
+        <button
+          onClick={onConnect}
+          className="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition"
+        >
+          Retry Connection
+        </button>
+      </div>
+    </div>
+  );
+}   
