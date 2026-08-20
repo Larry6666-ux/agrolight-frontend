@@ -532,6 +532,7 @@ function HomeTab({ ctx, openScreen, goToTab }) {
       }
            {/* Quick Action Endpoints Bar */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
         {[
           { label: 'Market Prices', path: '/api/market-prices' },
           { label: 'Farm Locations', path: '/api/farms' },
@@ -558,15 +559,13 @@ function HomeTab({ ctx, openScreen, goToTab }) {
                 }
               } catch (e) {
                 setActiveEndpointData({ title: item.label, error: e.message });
-             }
-        style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
-      >
-        {item.label}
-      </button>
-    )}
-  </div>
-      {/* Dynamic Data Display Card */}
-      {activeEndpointData && (
+              }}
+            style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
+          >
+            {item.label}
+          </button>
+        )}
+      </div>
         <div style={{ background: '#1f2937', color: '#fff', padding: '16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #374151' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <h4 style={{ margin: 0, color: '#10b981' }}>{activeEndpointData.title} Result</h4>
