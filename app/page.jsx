@@ -503,12 +503,13 @@ function HomeTab({ ctx, openScreen, goToTab }) {
       </button>
       {/* Quick Action Endpoints Bar */}
 <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '12px', background: '#0f172a', margin: '12px 0', borderRadius: '8px' }}>
-  {[
-    { label: "Gov Portal", path: "/api/government" },
-    { label: "Finance", path: "/api/finance" },
-    { label: "Logistics", path: "/api/logistics" },
-    { label: "Processing", path: "/api/processing" },
-    { label: "AI Copilot", path: "/api/ai/copilot" }
+ {[
+  { label: "Gov Portal", path: "/api/government/farmer-statistics" },
+  { label: "Finance", path: "/api/finance/wallet/balance" },
+  { label: "Logistics", path: "/api/logistics/deliveries" },
+  { label: "Processing", path: "/api/processing/centres" },
+  { label: "AI Copilot", path: "/api/ai/copilot" }
+]
   ].map((item) => (
     <button 
       key={item.path}
