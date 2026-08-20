@@ -520,17 +520,16 @@ function HomeTab({ ctx, openScreen, goToTab }) {
                   headers: { 'Content-Type': 'application/json' },
                   ...(item.method === 'POST' ? { body: JSON.stringify({ prompt: "Hello AI Copilot" }) } : {})
                 };
-              const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
+             const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
         if (res.ok) {
           const data = await res.json();
           setActiveEndpointData({ title: item.label, content: data });
         } else {
           setActiveEndpointData({ title: item.label, error: "Status " + res.status + ": " + res.statusText });
         }
-              } catch (e) {
-                setActiveEndpointData({ title: item.label, error: e.message });
-              }
-            }}
+      } catch (e) {
+        setActiveEndpointData({ title: item.label, error: e.message });
+      }
            {/* Quick Action Endpoints Bar */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
         {[
