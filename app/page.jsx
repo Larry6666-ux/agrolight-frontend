@@ -512,7 +512,19 @@ function HomeTab({ ctx, openScreen, goToTab }) {
   ].map((item) => (
     <button 
       key={item.path}
-      onClick={() => fetch('https://agrolight-os-backend.vercel.app' + item.path).then(r => r.json()).then(console.log)}
+      onClick={async () => {
+  try {
+    const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path);
+    if (res.ok) {
+      const data = await res.json();
+      alert(item.label + ' Data: ' + JSON.stringify(data));
+    } else {
+      alert(item.label + ' status: ' + res.status + ' (Endpoint path not found on backend)');
+    }
+  } catch (err) {
+    alert('Failed to connect to backend');
+  }
+}}
       style={{ padding: '6px 12px', background: '#22c55e', color: '#fff', borderRadius: '6px', fontSize: '12px', border: 'none', whiteSpace: 'nowrap' }}
     >
       {item.label}
