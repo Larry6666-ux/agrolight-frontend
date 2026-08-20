@@ -501,6 +501,24 @@ function HomeTab({ ctx, openScreen, goToTab }) {
           </div>
         </div>
       </button>
+      {/* Quick Action Endpoints Bar */}
+<div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '12px', background: '#0f172a', margin: '12px 0', borderRadius: '8px' }}>
+  {[
+    { label: "Gov Portal", path: "/api/government" },
+    { label: "Finance", path: "/api/finance" },
+    { label: "Logistics", path: "/api/logistics" },
+    { label: "Processing", path: "/api/processing" },
+    { label: "AI Copilot", path: "/api/ai/copilot" }
+  ].map((item) => (
+    <button 
+      key={item.path}
+      onClick={() => fetch('https://agrolight-os-backend.vercel.app' + item.path).then(r => r.json()).then(console.log)}
+      style={{ padding: '6px 12px', background: '#22c55e', color: '#fff', borderRadius: '6px', fontSize: '12px', border: 'none', whiteSpace: 'nowrap' }}
+    >
+      {item.label}
+    </button>
+  ))}
+</div>
 
       <div className="px-4 grid grid-cols-3 gap-2 mt-3">
         <MiniStat emoji="🌾" label="Produce Value" value={`₦${(produceValue / 1000).toFixed(0)}k`} color={BRAND.green} />
