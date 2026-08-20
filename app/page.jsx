@@ -540,32 +540,31 @@ function HomeTab({ ctx, openScreen, goToTab }) {
           { label: 'Copilot Chat Test', path: '/api/copilot', method: 'POST' },
           { label: 'Analytics Summary', path: '/api/analytics' },
         ].map((item, index) => (
-          <button
-            key={index}
-            onClick={async () => {
-              setActiveEndpointData({ title: item.label, content: 'Loading...' });
-              try {
-                const options = {
-                  method: item.method || 'GET',
-                  headers: { 'Content-Type': 'application/json' },
-                  ...(item.method === 'POST' ? { body: JSON.stringify({ prompt: "Hello AI Copilot" }) } : {})
-                };
-                const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
-                if (res.ok) {
-                  const data = await res.json();
-                  setActiveEndpointData({ title: item.label, content: data });
-                } else {
-                  setActiveEndpointData({ title: item.label, error: "Status " + res.status + ": " + res.statusText });
-                }
-              } catch (e) {
-                setActiveEndpointData({ title: item.label, error: e.message });
+      <button
+          onClick={async () => {
+            setActiveEndpointData({ title: item.label, content: 'Loading...' });
+            try {
+              const options = {
+                method: item.method || 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                ...(item.method === 'POST' ? { body: JSON.stringify({ data: 'test' }) } : {})
+              };
+              const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
+              if (res.ok) {
+                const data = await res.json();
+                setActiveEndpointData({ title: item.label, content: data });
+              } else {
+                setActiveEndpointData({ title: item.label, error: "Status " + res.status });
               }
-            }}
-            style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
-          >
-            {item.label}
-          </button>
-        )}
+            } catch (e) {
+              setActiveEndpointData({ title: item.label, error: e.message });
+            }
+          }}
+          style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
+        >
+          {item.label}
+        </button>
+      ))}
       </div>
         <div style={{ background: '#1f2937', color: '#fff', padding: '16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #374151' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
