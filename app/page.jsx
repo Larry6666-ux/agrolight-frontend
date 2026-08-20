@@ -559,7 +559,8 @@ function HomeTab({ ctx, openScreen, goToTab }) {
                 }
               } catch (e) {
                 setActiveEndpointData({ title: item.label, error: e.message });
-              }}}
+              }
+            }}
             style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
           >
             {item.label}
