@@ -1,4 +1,4 @@
-
+'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
@@ -124,8 +124,7 @@ const [activeEndpointData, setActiveEndpointData] = useState(null);
   const [adminData, setAdminData] = useState(null);
   const [toast, setToast] = useState(null);
   const buyerSessionRef = useRef(null);
-const [activeEndpointData, setActiveEndpointData] = useState(null);
-  const showToast = (msg) => {
+q  const showToast = (msg) => {
     setToast(msg);
     window.clearTimeout(showToast._t);
     showToast._t = window.setTimeout(() => setToast(null), 2400);
