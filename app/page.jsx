@@ -147,7 +147,33 @@ export default function AgroLightPrototype() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+if (!user) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "sans-serif", padding: "20px" }}>
+        <div style={{ background: "white", padding: "30px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", width: "100%", maxWidth: "400px", textAlign: "center" }}>
+          <h2 style={{ color: "#065f46", marginBottom: "8px" }}>🌱 AgroLight OS</h2>
+          <p style={{ color: "#4b5563", fontSize: "14px", marginBottom: "24px" }}>Enter any details to access your workspace</p>
+          
+          <input 
+            type="text" 
+            placeholder="Type any name or details..." 
+            value={loginInput}
+            onChange={(e) => setLoginInput(e.target.value)}
+            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "16px", fontSize: "14px", boxSizing: "border-box" }}
+          />
+          
+          <button 
+            onClick={() => {
+              setUser({ name: loginInput || "Demo Farmer", email: "farmer@agrolight.demo" });
+            }}
+            style={{ width: "100%", padding: "12px", background: "#059669", color: "white", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "14px", cursor: "pointer" }}
+          >
+            Login / Register Demo
+          </button>
+        </div>
+      </div>
+    );
+  }
   async function tryRestore(base, tok, cachedUser) {
     try {
       await apiFetch(base, tok, "/api/farmers/farms");
@@ -261,32 +287,7 @@ export default function AgroLightPrototype() {
     buyerSessionRef.current = login;
     return login;
   }
-{/* Login Screen Check */}
-  {!user && (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "sans-serif", padding: "20px" }}>
-      <div style={{ background: "white", padding: "30px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", width: "100%", maxWidth: "400px", textAlign: "center" }}>
-        <h2 style={{ color: "#065f46", marginBottom: "8px" }}>🌱 AgroLight OS</h2>
-        <p style={{ color: "#4b5563", fontSize: "14px", marginBottom: "24px" }}>Enter any details to access your workspace</p>
-        
-        <input 
-          type="text" 
-          placeholder="Type any name or details..." 
-          value={loginInput}
-          onChange={(e) => setLoginInput(e.target.value)}
-          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "16px", fontSize: "14px", boxSizing: "border-box" }}
-        />
-        
-        <button 
-          onClick={() => {
-            setUser({ name: loginInput || "Demo Farmer", email: "farmer@agrolight.demo" });
-          }}
-          style={{ width: "100%", padding: "12px", background: "#059669", color: "white", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "14px", cursor: "pointer" }}
-        >
-          Login / Register Demo
-        </button>
-      </div>
-    </div>
-  )}
+
   if (conn.status === "loading") {
     return <FullScreenNote icon={Loader2} spin text="Checking for a saved connection…" />;
   }
