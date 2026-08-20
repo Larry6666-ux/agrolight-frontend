@@ -1,4 +1,4 @@
-"use client";
+
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
@@ -114,6 +114,8 @@ export default function AgroLightPrototype() {
 
   const [data, setData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+ 
+const [activeEndpointData, setActiveEndpointData] = useState(null);
 
   const [tab, setTab] = useState("home");
   const [screen, setScreen] = useState(null);
