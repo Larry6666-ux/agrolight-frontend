@@ -531,13 +531,41 @@ function HomeTab({ ctx, openScreen, goToTab }) {
                 setActiveEndpointData({ title: item.label, error: e.message });
               }
             }}
-            style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '12px', fontWeight: 'bold' }}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
+           {/* Quick Action Endpoints Bar */}
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+        {[
+          { label: 'Market Prices', path: '/api/market-prices' },
+          { label: 'Farm Locations', path: '/api/farms' },
+          { label: 'Solar Hardware', path: '/api/hardware' },
+          { label: 'Copilot Chat Test', path: '/api/copilot', method: 'POST' },
+          { label: 'Analytics Summary', path: '/api/analytics' },
+        ].map((item, index) => (
+          <button
+            key={index}
+            onClick={async () => {
+              setActiveEndpointData({ title: item.label, content: 'Loading...' });
+              try {
+                const options = {
+                  method: item.method || 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                  ...(item.method === 'POST' ? { body: JSON.stringify({ prompt: "Hello AI Copilot" }) } : {})
+                };
+                const res = await fetch('https://agrolight-os-backend.vercel.app' + item.path, options);
+                if (res.ok) {
+                  const data = await res.json();
+                  setActiveEndpointData({ title: item.label, content: data });
+                } else {
+                  setActiveEndpointData({ title: item.label, error: "Status " + res.status + ": " + res.statusText });
+                }
+              } catch (e) {
+                setActiveEndpointData({ title: item.label, error: e.message });
+             }
+        style={{ padding: '8px 12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
+      >
+        {item.label}
+      </button>
+    )}
+  </div>
       {/* Dynamic Data Display Card */}
       {activeEndpointData && (
         <div style={{ background: '#1f2937', color: '#fff', padding: '16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #374151' }}>
@@ -561,9 +589,6 @@ function HomeTab({ ctx, openScreen, goToTab }) {
           )}
         </div>
       )}
-    </button>
-  ))}
-</div>
 
       <div className="px-4 grid grid-cols-3 gap-2 mt-3">
         <MiniStat emoji="🌾" label="Produce Value" value={`₦${(produceValue / 1000).toFixed(0)}k`} color={BRAND.green} />
