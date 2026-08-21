@@ -739,6 +739,8 @@ function ScreenRouter({ screen, ctx, goBack, openScreen }) {
     case "bookColdStorage": return <BookColdStorageScreen {...props} />;
     case "transport": return <TransportScreen {...props} />;
     case "wallet": return <WalletScreen {...props} />;
+    case "withdraw": return <WithdrawScreen {...props} />;
+    case "receipt": return <ReceiptScreen {...props} />;
     case "newListing": return <NewListingScreen {...props} />;
     case "aiCopilot": return <AICopilotScreen {...props} />;
     default: return null;
