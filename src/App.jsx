@@ -328,51 +328,75 @@ export default function AgroLightPrototype() {
   );
 }
 
-function WalletScreen({ ctx, goBack, openScreen }) {
-  const { data } = ctx;
+
+function WithdrawScreen({ ctx, goBack }) {
+  const { apiBase, token, data, refreshAll, showToast } = ctx;
+  const [amount, setAmount] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    if (!amount || !bankName || !accountNumber) return;
+    setSaving(true);
+    try {
+      await apiFetch(apiBase, token, "/api/finance/withdrawals", {
+        method: "POST",
+        body: JSON.stringify({ amount: Number(amount), bankName, accountNumber }),
+      });
+      showToast("Withdrawal submitted for processing");
+      await refreshAll();
+      goBack();
+    } catch (e) {
+      showToast("Withdrawal failed: " + e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="pb-6">
-      <TopBar title="Wallet" onBack={goBack} />
-      
-      <div className="px-4 mt-2">
-        <Card className="text-center py-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-5" style={{ background: BRAND.green, transform: "translate(30%, -30%)" }} />
-          <p className="text-[10.5px] font-medium" style={{ color: "#9AA39B" }}>Available Balance</p>
-          <p className="text-3xl font-bold agro-display mt-1" style={{ color: BRAND.green }}>₦{Number(data.wallet.balance).toLocaleString()}</p>
-          <div className="flex gap-2 mt-4 justify-center">
-            <button onClick={() => openScreen("withdraw")} className="text-[11px] font-semibold px-4 py-2 rounded-full text-white flex items-center gap-1.5" style={{ background: BRAND.green }}>
-              <Banknote size={14} /> Withdraw
-            </button>
-          </div>
-        </Card>
+      <TopBar title="Withdraw Funds" onBack={goBack} />
+      <div className="px-4 flex flex-col gap-2.5 mt-2">
+        <div className="rounded-2xl p-4 mb-2" style={{ background: BRAND.greenSoft }}>
+          <p className="text-[10px] font-medium" style={{ color: "#6b7a71" }}>Available for withdrawal</p>
+          <p className="text-xl font-bold agro-display mt-0.5" style={{ color: BRAND.green }}>₦{Number(data.wallet.balance).toLocaleString()}</p>
+        </div>
+        <div><Label>Amount (₦)</Label><Input value={amount} onChange={setAmount} placeholder="e.g. 50000" /></div>
+        <div><Label>Bank Name</Label><Input value={bankName} onChange={setBankName} placeholder="e.g. First Bank of Nigeria" /></div>
+        <div><Label>Account Number</Label><Input value={accountNumber} onChange={setAccountNumber} placeholder="10 digit account number" /></div>
+        <div className="mt-2"><PrimaryButton onClick={submit} disabled={!amount || !bankName || !accountNumber} loading={saving} icon={Banknote}>Request Withdrawal</PrimaryButton></div>
+        <p className="text-[10px] text-center mt-2" style={{ color: "#C7CFC8" }}>Processed within 24 hours. 2% processing fee applies.</p>
       </div>
+    </div>
+  );
+}
+function ReceiptScreen({ ctx, goBack, screen }) {
+  const tx = screen.props?.tx;
+  if (!tx) return <EmptyState icon={Receipt} text="Receipt not found." />;
 
-      <SectionTitle>Transaction History</SectionTitle>
-      <div className="px-4 flex flex-col gap-2">
-        {data.walletHistory.length === 0 && <EmptyState icon={WalletIcon} text="No transactions yet." />}
-        {data.walletHistory.map((tx) => (
-          <Card key={tx.id} className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: Number(tx.amount) >= 0 ? BRAND.greenSoft : "#FDECEA" }}>
-                {Number(tx.amount) >= 0 ? <TrendingUp size={14} color={BRAND.green} /> : <Banknote size={14} color="#B14545" />}
-              </div>
-              <div>
-                <p className="text-xs font-semibold" style={{ color: BRAND.ink }}>{tx.description}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "#9AA39B" }}>{new Date(tx.createdAt).toLocaleDateString()}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-xs font-bold" style={{ color: Number(tx.amount) >= 0 ? BRAND.green : "#B14545" }}>
-                {Number(tx.amount) >= 0 ? "+" : ""}₦{Number(tx.amount).toLocaleString()}
-              </p>
-              {tx.receiptReference && (
-                <button onClick={() => openScreen("receipt", { tx })} className="text-[9px] font-medium mt-0.5" style={{ color: BRAND.blue }}>
-                  View Receipt
-                </button>
-              )}
-            </div>
-          </Card>
-        ))}
+  return (
+    <div className="pb-6">
+      <TopBar title="Receipt" onBack={goBack} />
+      <div className="px-4 mt-2">
+        <Card className="text-center py-6 border-2" style={{ borderColor: BRAND.greenSoft, background: "#FAFDFB" }}>
+          <div className="w-12 h-12 rounded-full mx-auto flex items-center justify-center mb-3" style={{ background: BRAND.greenSoft }}>
+            <Check size={20} color={BRAND.green} />
+          </div>
+          <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#9AA39B" }}>Transaction Successful</p>
+          <p className="text-2xl font-bold agro-display mt-1" style={{ color: BRAND.ink }}>
+            {Number(tx.amount) >= 0 ? "+" : ""}₦{Number(tx.amount).toLocaleString()}
+          </p>
+          <div className="mt-4 space-y-2 text-left px-2">
+            <div className="flex justify-between text-xs"><span style={{ color: "#9AA39B" }}>Description</span><span className="font-medium" style={{ color: BRAND.ink }}>{tx.description}</span></div>
+            <div className="flex justify-between text-xs"><span style={{ color: "#9AA39B" }}>Date</span><span className="font-medium" style={{ color: BRAND.ink }}>{new Date(tx.createdAt).toLocaleString()}</span></div>
+            <div className="flex justify-between text-xs"><span style={{ color: "#9AA39B" }}>Reference</span><span className="font-medium" style={{ color: BRAND.ink }}>{tx.receiptReference || "N/A"}</span></div>
+            <div className="flex justify-between text-xs"><span style={{ color: "#9AA39B" }}>Type</span><span className="font-medium" style={{ color: BRAND.ink }}>{tx.type || "Transfer"}</span></div>
+          </div>
+          <button onClick={() => showToast("Receipt downloaded")} className="mt-5 w-full rounded-xl py-2.5 text-xs font-semibold border flex items-center justify-center gap-2" style={{ borderColor: BRAND.green, color: BRAND.green }}>
+            <Receipt size={14} /> Download Receipt
+          </button>
+        </Card>
       </div>
     </div>
   );
@@ -968,11 +992,23 @@ function BookColdStorageScreen({ ctx, goBack }) {
 }
 
 function TransportScreen({ ctx, goBack }) {
-  const { apiBase, token, showToast } = ctx;
+  const { apiBase, token, data, refreshAll, showToast } = ctx;
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
   const [sent, setSent] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deliveries, setDeliveries] = useState([]);
+
+  useEffect(() => {
+    if (!sent) fetchDeliveries();
+  }, [sent]);
+
+  async function fetchDeliveries() {
+    try {
+      const res = await apiFetch(apiBase, token, "/api/logistics/deliveries/mine").catch(() => []);
+      setDeliveries(res || []);
+    } catch { /* ignore */ }
+  }
 
   const send = async () => {
     setSaving(true);
@@ -983,38 +1019,133 @@ function TransportScreen({ ctx, goBack }) {
       });
       setSent(true);
       showToast("Transport requested");
+      await fetchDeliveries();
     } catch (e) {
       showToast("Couldn't request transport: " + e.message);
     } finally { setSaving(false); }
   };
 
+  const statusSteps = [
+    { key: "requested", label: "Requested", icon: CircleDot },
+    { key: "accepted", label: "Accepted", icon: CheckCircle2 },
+    { key: "picked_up", label: "Picked Up", icon: Package },
+    { key: "in_transit", label: "In Transit", icon: TruckIcon },
+    { key: "delivered", label: "Delivered", icon: Check },
+  ];
+
   return (
     <div className="pb-6">
-      <TopBar title="Transport Request" onBack={goBack} />
-      {sent ? <div className="px-4"><EmptyState icon={Truck} text="Request sent. A verified transporter will accept shortly." /></div> : (
-        <div className="px-4 flex flex-col gap-2.5">
-          <div><Label>Pickup location</Label><Input value={pickup} onChange={setPickup} placeholder="e.g. Amos Family Farm" /></div>
+      <TopBar title="Transport & Logistics" onBack={goBack} />
+      {!sent ? (
+        <div className="px-4 flex flex-col gap-2.5 mt-2">
+          <div className="rounded-2xl p-4 mb-2" style={{ background: BRAND.blueSoft }}>
+            <div className="flex items-center gap-2 mb-1">
+              <TruckIcon size={16} color={BRAND.blue} />
+              <p className="text-xs font-bold" style={{ color: BRAND.blue }}>Request a Transporter</p>
+            </div>
+            <p className="text-[10px]" style={{ color: "#6b7a71" }}>Verified drivers pick up from your farm and deliver to buyers or processors.</p>
+          </div>
+          <div><Label>Pickup location</Label><Input value={pickup} onChange={setPickup} placeholder="e.g. Amos Family Farm, Benin" /></div>
           <div><Label>Drop-off location</Label><Input value={dropoff} onChange={setDropoff} placeholder="e.g. Ovie Cassava Processors" /></div>
-          <div className="mt-2"><PrimaryButton icon={Truck} disabled={!pickup || !dropoff} loading={saving} onClick={send}>Find transport</PrimaryButton></div>
+          <div className="mt-2"><PrimaryButton icon={Truck} disabled={!pickup || !dropoff} loading={saving} onClick={send}>Find Transport</PrimaryButton></div>
+        </div>
+      ) : (
+        <div className="px-4 flex flex-col gap-2.5 mt-2">
+          <div className="rounded-2xl p-4 text-center" style={{ background: BRAND.greenSoft }}>
+            <CheckCircle2 size={24} color={BRAND.green} className="mx-auto mb-2" />
+            <p className="text-xs font-bold" style={{ color: BRAND.green }}>Request Sent</p>
+            <p className="text-[10px] mt-1" style={{ color: "#6b7a71" }}>A verified transporter will accept shortly. You'll be notified.</p>
+          </div>
+          
+          {deliveries.length === 0 && <EmptyState icon={Clock} text="No delivery history yet." />}
+          {deliveries.map((d) => {
+            const currentStep = statusSteps.findIndex(s => s.key === d.status);
+            return (
+              <Card key={d.id} className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: BRAND.ink }}>{d.pickupLocation} → {d.dropoffLocation}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: "#9AA39B" }}>Requested {new Date(d.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <StatusPill status={d.status === "delivered" ? "available" : d.status === "in_transit" ? "processing" : "listed"} />
+                </div>
+                
+                <div className="flex items-center justify-between px-1">
+                  {statusSteps.map((step, i) => {
+                    const active = i <= currentStep;
+                    return (
+                      <div key={step.key} className="flex flex-col items-center gap-1 flex-1">
+                        <step.icon size={14} color={active ? BRAND.green : "#C7CFC8"} />
+                        <span className="text-[8px] font-medium" style={{ color: active ? BRAND.green : "#C7CFC8" }}>{step.label}</span>
+                        {i < statusSteps.length - 1 && (
+                          <div className="absolute w-full h-0.5" style={{ background: active ? BRAND.green : "#EFEFE8" }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {d.gpsLastLocation && (
+                  <p className="text-[10px] flex items-center gap-1" style={{ color: BRAND.blue }}>
+                    <Navigation size={10} /> Last seen: {d.gpsLastLocation}
+                  </p>
+                )}
+              </Card>
+            );
+          })}
+          
+          <button onClick={() => { setSent(false); setPickup(""); setDropoff(""); }} className="w-full rounded-xl py-2.5 text-xs font-semibold border-2 border-dashed flex items-center justify-center gap-1.5" style={{ borderColor: "#D7E4DB", color: BRAND.green }}>
+            <Plus size={14} /> New Transport Request
+          </button>
         </div>
       )}
     </div>
   );
 }
 
-function WalletScreen({ ctx, goBack }) {
+function WalletScreen({ ctx, goBack, openScreen }) {
   const { data } = ctx;
   return (
     <div className="pb-6">
       <TopBar title="Wallet" onBack={goBack} />
-      <div className="px-4"><Card className="text-center py-5"><p className="text-[10.5px]" style={{ color: "#9AA39B" }}>Current balance</p><p className="text-2xl font-bold agro-display mt-1" style={{ color: BRAND.green }}>₦{Number(data.wallet.balance).toLocaleString()}</p></Card></div>
-      <SectionTitle>Transaction history</SectionTitle>
+      
+      <div className="px-4 mt-2">
+        <Card className="text-center py-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-5" style={{ background: BRAND.green, transform: "translate(30%, -30%)" }} />
+          <p className="text-[10.5px] font-medium" style={{ color: "#9AA39B" }}>Available Balance</p>
+          <p className="text-3xl font-bold agro-display mt-1" style={{ color: BRAND.green }}>₦{Number(data.wallet.balance).toLocaleString()}</p>
+          <div className="flex gap-2 mt-4 justify-center">
+            <button onClick={() => openScreen("withdraw")} className="text-[11px] font-semibold px-4 py-2 rounded-full text-white flex items-center gap-1.5" style={{ background: BRAND.green }}>
+              <Banknote size={14} /> Withdraw
+            </button>
+          </div>
+        </Card>
+      </div>
+
+      <SectionTitle>Transaction History</SectionTitle>
       <div className="px-4 flex flex-col gap-2">
         {data.walletHistory.length === 0 && <EmptyState icon={WalletIcon} text="No transactions yet." />}
         {data.walletHistory.map((tx) => (
           <Card key={tx.id} className="flex items-center justify-between">
-            <div><p className="text-xs font-semibold" style={{ color: BRAND.ink }}>{tx.description}</p><p className="text-[10px] mt-0.5" style={{ color: "#9AA39B" }}>{new Date(tx.createdAt).toLocaleDateString()}</p></div>
-            <p className="text-xs font-bold" style={{ color: Number(tx.amount) >= 0 ? BRAND.green : "#B14545" }}>{Number(tx.amount) >= 0 ? "+" : ""}₦{Number(tx.amount).toLocaleString()}</p>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: Number(tx.amount) >= 0 ? BRAND.greenSoft : "#FDECEA" }}>
+                {Number(tx.amount) >= 0 ? <TrendingUp size={14} color={BRAND.green} /> : <Banknote size={14} color="#B14545" />}
+              </div>
+              <div>
+                <p className="text-xs font-semibold" style={{ color: BRAND.ink }}>{tx.description}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "#9AA39B" }}>{new Date(tx.createdAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-bold" style={{ color: Number(tx.amount) >= 0 ? BRAND.green : "#B14545" }}>
+                {Number(tx.amount) >= 0 ? "+" : ""}₦{Number(tx.amount).toLocaleString()}
+              </p>
+              {tx.receiptReference && (
+                <button onClick={() => openScreen("receipt", { tx })} className="text-[9px] font-medium mt-0.5" style={{ color: BRAND.blue }}>
+                  View Receipt
+                </button>
+              )}
+            </div>
           </Card>
         ))}
       </div>
@@ -1345,7 +1476,133 @@ function AdminDashboard({ adminData, onExit }) {
       </div>
     </div>
   );
+  function GovernmentTab({ ctx }) {
+  const { apiBase, token } = ctx;
+  const [govtData, setGovtData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGovtData() {
+      try {
+        const [farmers, market, processing, production, food, regional] = await Promise.all([
+          apiFetch(apiBase, token, "/api/government/farmer-statistics").catch(() => null),
+          apiFetch(apiBase, token, "/api/government/market-analytics").catch(() => null),
+          apiFetch(apiBase, token, "/api/government/processing-reports").catch(() => null),
+          apiFetch(apiBase, token, "/api/government/production-reports").catch(() => null),
+          apiFetch(apiBase, token, "/api/government/food-security-indicators").catch(() => null),
+          apiFetch(apiBase, token, "/api/government/regional-performance").catch(() => null),
+        ]);
+        setGovtData({ farmers, market, processing, production, food, regional });
+      } catch (e) {
+        setGovtData({
+          farmers: { totalFarmers: 1247, byState: [{state:"Edo",count:842},{state:"Delta",count:305},{state:"Lagos",count:100}] },
+          market: { totalListings: 456, avgPricePerTon: 285000, topCrop: "Cassava" },
+          processing: { totalCentres: 28, utilizationRate: 72, avgRating: 4.6 },
+          production: { totalTons: 15800, byCrop: [{crop:"Cassava",tons:8200},{crop:"Maize",tons:4100},{crop:"Yam",tons:3500}] },
+          food: { securityIndex: 78, wasteReduction: 34 },
+          regional: { bestPerforming: "Edo South", growthRate: 12.5 }
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchGovtData();
+  }, [apiBase, token]);
+
+  if (loading) return <FullScreenNote icon={Loader2} spin text="Loading national analytics…" />;
+  if (!govtData) return <EmptyState icon={BarChart3} text="No government data available." />;
+
+  const d = govtData;
+
+  return (
+    <div className="pb-6">
+      <div className="mx-4 mt-3 rounded-2xl p-4 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${BRAND.ink}, #0F1A12)` }}>
+        <Landmark className="absolute -right-3 -bottom-3 opacity-10" size={90} color="#FFFFFF" />
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: BRAND.gold }} />
+          <p className="text-[10px] font-medium text-white/70 uppercase tracking-wider">Federal Ministry of Agriculture</p>
+        </div>
+        <h1 className="agro-display text-lg font-bold text-white">National Dashboard</h1>
+        <p className="text-[11px] text-white/60 mt-1">Real-time agricultural intelligence across all states</p>
+      </div>
+
+      <div className="px-4 grid grid-cols-2 gap-2 mt-3">
+        <GovtCard label="Registered Farmers" value={d.farmers?.totalFarmers?.toLocaleString() || "—"} icon={Users} color={BRAND.green} />
+        <GovtCard label="Active Listings" value={d.market?.totalListings?.toLocaleString() || "—"} icon={Store} color={BRAND.blue} />
+        <GovtCard label="Processing Centres" value={d.processing?.totalCentres?.toLocaleString() || "—"} icon={Wrench} color={BRAND.gold} />
+        <GovtCard label="Total Production" value={`${((d.production?.totalTons || 0) / 1000).toFixed(1)}k t`} icon={Package} color="#2C6E9E" />
+      </div>
+
+      <SectionTitle>State Breakdown</SectionTitle>
+      <div className="px-4 flex flex-col gap-2">
+        {(d.farmers?.byState || []).map((s, i) => (
+          <Card key={i} className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: BRAND.green }}>
+              {s.state?.[0] || "?"}
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold" style={{ color: BRAND.ink }}>{s.state || "Unspecified"}</p>
+              <div className="w-full h-1.5 rounded-full mt-1" style={{ background: "#EFEFE8" }}>
+                <div className="h-1.5 rounded-full" style={{ width: `${Math.min(100, (s.count / Math.max(d.farmers?.totalFarmers || 1, 1)) * 100)}%`, background: BRAND.green }} />
+              </div>
+            </div>
+            <p className="text-xs font-bold" style={{ color: BRAND.ink }}>{s.count}</p>
+          </Card>
+        ))}
+      </div>
+
+      <SectionTitle>Production by Crop</SectionTitle>
+      <div className="px-4 flex flex-col gap-2">
+        {(d.production?.byCrop || []).map((c, i) => (
+          <Card key={i} className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-base">{c.crop === "Cassava" ? "🌾" : c.crop === "Maize" ? "🌽" : c.crop === "Yam" ? "🍠" : "🌱"}</span>
+              <p className="text-xs font-semibold" style={{ color: BRAND.ink }}>{c.crop}</p>
+            </div>
+            <div className="flex items-center gap-2 flex-1 mx-3">
+              <div className="flex-1 h-2 rounded-full" style={{ background: "#EFEFE8" }}>
+                <div className="h-2 rounded-full" style={{ width: `${Math.min(100, (c.tons / Math.max(d.production?.totalTons || 1, 1)) * 100)}%`, background: BRAND.gold }} />
+              </div>
+            </div>
+            <p className="text-xs font-bold" style={{ color: BRAND.ink }}>{c.tons.toLocaleString()}t</p>
+          </Card>
+        ))}
+      </div>
+
+      <div className="px-4 grid grid-cols-2 gap-2 mt-3">
+        <div className="rounded-2xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <ShieldCheck size={14} color={BRAND.green} />
+            <span className="text-[10px] font-semibold" style={{ color: BRAND.ink }}>Food Security Index</span>
+          </div>
+          <p className="text-xl font-bold agro-display" style={{ color: BRAND.green }}>{d.food?.securityIndex || 0}<span className="text-xs font-normal text-gray-400">/100</span></p>
+          <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>Waste reduced by {d.food?.wasteReduction || 0}%</p>
+        </div>
+        <div className="rounded-2xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <TrendingUp size={14} color={BRAND.blue} />
+            <span className="text-[10px] font-semibold" style={{ color: BRAND.ink }}>Top Region</span>
+          </div>
+          <p className="text-sm font-bold agro-display" style={{ color: BRAND.ink }}>{d.regional?.bestPerforming || "—"}</p>
+          <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>+{d.regional?.growthRate || 0}% growth</p>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+function GovtCard({ label, value, icon: Icon, color }) {
+  return (
+    <div className="rounded-xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
+      <div className="flex items-center gap-1.5 mb-2">
+        <Icon size={14} color={color} />
+        <span className="text-[9.5px] font-medium" style={{ color: "#9AA39B" }}>{label}</span>
+      </div>
+      <p className="text-lg font-bold agro-display" style={{ color }}>{value}</p>
+    </div>
+  );
+}
+
 
 
 
