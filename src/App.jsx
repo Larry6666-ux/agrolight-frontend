@@ -1345,5 +1345,4 @@ function AdminDashboard({ adminData, onExit }) {
 }
 
 
-export default App;
 
