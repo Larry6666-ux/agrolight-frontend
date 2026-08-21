@@ -328,54 +328,55 @@ export default function AgroLightPrototype() {
   );
 }
 
-function ConnectScreen({ apiBase, setApiBase, status, errorMsg, onConnect }) {
+function WalletScreen({ ctx, goBack, openScreen }) {
+  const { data } = ctx;
   return (
-    <div className="w-full min-h-screen flex items-center justify-center px-6" style={{ background: BRAND.paper, fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-xl border p-6" style={{ borderColor: "#EFEFE8" }}>
-        <div className="flex flex-col items-center text-center mb-5">
-          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ background: BRAND.greenSoft }}>
-            <Server size={24} color={BRAND.green} />
+    <div className="pb-6">
+      <TopBar title="Wallet" onBack={goBack} />
+      
+      <div className="px-4 mt-2">
+        <Card className="text-center py-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-5" style={{ background: BRAND.green, transform: "translate(30%, -30%)" }} />
+          <p className="text-[10.5px] font-medium" style={{ color: "#9AA39B" }}>Available Balance</p>
+          <p className="text-3xl font-bold agro-display mt-1" style={{ color: BRAND.green }}>₦{Number(data.wallet.balance).toLocaleString()}</p>
+          <div className="flex gap-2 mt-4 justify-center">
+            <button onClick={() => openScreen("withdraw")} className="text-[11px] font-semibold px-4 py-2 rounded-full text-white flex items-center gap-1.5" style={{ background: BRAND.green }}>
+              <Banknote size={14} /> Withdraw
+            </button>
           </div>
-          <h1 className="text-lg font-bold" style={{ color: BRAND.ink }}>Connect to your AgroLight OS backend</h1>
-          <p className="text-xs mt-2" style={{ color: "#9AA39B" }}>
-            Enter the URL where your Next.js + Drizzle API is running — a local dev server (with a tunnel like ngrok) or a deployed instance.
-          </p>
-        </div>
+        </Card>
+      </div>
 
-        <label className="text-[11px] font-semibold" style={{ color: "#9AA39B" }}>Backend URL</label>
-        <input
-          value={apiBase}
-          onChange={(e) => setApiBase(e.target.value)}
-          placeholder="https://your-backend.example.com"
-          className="w-full mt-1 mb-3 rounded-lg px-3 py-2.5 text-sm border outline-none"
-          style={{ borderColor: "#EFEFE8", color: BRAND.ink }}
-        />
-
-        <button
-          onClick={() => onConnect(apiBase)}
-          disabled={status === "connecting" || !apiBase}
-          className="w-full rounded-xl py-3 text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-50"
-          style={{ background: BRAND.green }}
-        >
-          {status === "connecting" ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
-          {status === "connecting" ? "Connecting…" : "Connect & log in as demo farmer"}
-        </button>
-
-        {status === "error" && (
-          <div className="mt-3 rounded-lg p-3 flex items-start gap-2" style={{ background: "#FDECEA" }}>
-            <WifiOff size={15} color="#C0392B" className="shrink-0 mt-0.5" />
-            <p className="text-[11px]" style={{ color: "#C0392B" }}>{errorMsg}</p>
-          </div>
-        )}
-
-        <p className="text-[10px] mt-4 text-center" style={{ color: "#C7CFC8" }}>
-          Logs in with the seeded demo farmer (08160510275). Run <code>npm run db:seed</code> on the backend first.
-        </p>
+      <SectionTitle>Transaction History</SectionTitle>
+      <div className="px-4 flex flex-col gap-2">
+        {data.walletHistory.length === 0 && <EmptyState icon={WalletIcon} text="No transactions yet." />}
+        {data.walletHistory.map((tx) => (
+          <Card key={tx.id} className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: Number(tx.amount) >= 0 ? BRAND.greenSoft : "#FDECEA" }}>
+                {Number(tx.amount) >= 0 ? <TrendingUp size={14} color={BRAND.green} /> : <Banknote size={14} color="#B14545" />}
+              </div>
+              <div>
+                <p className="text-xs font-semibold" style={{ color: BRAND.ink }}>{tx.description}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "#9AA39B" }}>{new Date(tx.createdAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-bold" style={{ color: Number(tx.amount) >= 0 ? BRAND.green : "#B14545" }}>
+                {Number(tx.amount) >= 0 ? "+" : ""}₦{Number(tx.amount).toLocaleString()}
+              </p>
+              {tx.receiptReference && (
+                <button onClick={() => openScreen("receipt", { tx })} className="text-[9px] font-medium mt-0.5" style={{ color: BRAND.blue }}>
+                  View Receipt
+                </button>
+              )}
+            </div>
+          </Card>
+        ))}
       </div>
     </div>
   );
 }
-
 function FullScreenNote({ icon: Icon, text, spin }) {
   return (
     <div className="w-full min-h-screen flex items-center justify-center" style={{ background: BRAND.paper }}>
