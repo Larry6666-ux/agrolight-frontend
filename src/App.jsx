@@ -314,11 +314,12 @@ export default function AgroLightPrototype() {
 
             {!screen && !adminMode && (
               <div className="flex items-stretch border-t bg-white" style={{ borderColor: "#EEEEE7" }}>
-                <NavBtn icon={Home} label="Home" active={tab === "home"} onClick={() => setTab("home")} />
-                <NavBtn icon={Store} label="Marketplace" active={tab === "market"} onClick={() => setTab("market")} dot />
-                <NavBtn icon={Wrench} label="Services" active={tab === "services"} onClick={() => setTab("services")} />
-                <NavBtn icon={Bell} label="Alerts" active={tab === "alerts"} onClick={() => setTab("alerts")} badge={data.notifications.filter((n) => !n.read).length} />
-                <NavBtn icon={User} label="Profile" active={tab === "profile"} onClick={() => setTab("profile")} />
+              <NavBtn icon={Home} label="Home" active={tab === "home"} onClick={() => setTab("home")} />
+              <NavBtn icon={Store} label="Market" active={tab === "market"} onClick={() => setTab("market")} dot />
+              <NavBtn icon={Wrench} label="Services" active={tab === "services"} onClick={() => setTab("services")} />
+              <NavBtn icon={Landmark} label="Govt" active={tab === "govt"} onClick={() => setTab("govt")} />
+              <NavBtn icon={Bell} label="Alerts" active={tab === "alerts"} onClick={() => setTab("alerts")} badge={data.notifications.filter((n) => !n.read).length} />
+              <NavBtn icon={User} label="Profile" active={tab === "profile"} onClick={() => setTab("profile")} />
               </div>
             )}
           </div>
