@@ -487,6 +487,7 @@ function TabRouter({ tab, ctx, openScreen, goToTab, onAdmin, onDisconnect }) {
   if (tab === "home") return <HomeTab ctx={ctx} openScreen={openScreen} goToTab={goToTab} />;
   if (tab === "market") return <MarketTab ctx={ctx} openScreen={openScreen} />;
   if (tab === "services") return <ServicesTab openScreen={openScreen} />;
+  if (tab === "govt") return <GovernmentTab ctx={ctx} />;
   if (tab === "alerts") return <AlertsTab ctx={ctx} />;
   if (tab === "profile") return <ProfileTab ctx={ctx} onAdmin={onAdmin} onDisconnect={onDisconnect} />;
   return null;
