@@ -1443,12 +1443,10 @@ function RecCard({ icon: Icon, title, subtitle, why, confirmLabel, buttonLabel, 
 
 function AdminDashboard({ adminData, onExit }) {
   if (!adminData) return <div className="pb-6"><TopBar title="Admin Dashboard" onBack={onExit} /><div className="px-4"><EmptyState icon={Loader2} text="Loading admin data…" /></div></div>;
-
   const targets = [
     { label: "Registered users (live)", value: adminData.users.length, target: 1000 },
     { label: "Pending verifications (live)", value: adminData.pending.length, target: 10 },
   ];
-
   return (
     <div className="pb-6">
       <TopBar title="Admin Dashboard" onBack={onExit} />
@@ -1459,12 +1457,11 @@ function AdminDashboard({ adminData, onExit }) {
           return (
             <Card key={t.label}>
               <div className="flex items-center justify-between mb-1.5"><p className="text-[11px] font-semibold" style={{ color: BRAND.ink }}>{t.label}</p><p className="text-[10.5px]" style={{ color: "#9AA39B" }}>{t.value} / {t.target}</p></div>
-              <div className="w-full h-1.5 rounded-full" style={{ background: "#EFEFE8" }}><div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: BRAND.green }} /></div>
+              <div className="w-full h-1.5 rounded-full" style={{ background: "#EFEFE8" }}><div className="h-1.5 rounded-full" style={{ width: ${pct}%, background: BRAND.green }} /></div>
             </Card>
           );
         })}
       </div>
-
       <SectionTitle>Registered users</SectionTitle>
       <div className="px-4 flex flex-col gap-2">
         {adminData.users.slice(0, 6).map((u) => (
@@ -1478,7 +1475,9 @@ function AdminDashboard({ adminData, onExit }) {
       </div>
     </div>
   );
-  function GovernmentTab({ ctx }) {
+}
+
+function GovernmentTab({ ctx }) {
   const { apiBase, token } = ctx;
   const [govtData, setGovtData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1502,7 +1501,7 @@ function AdminDashboard({ adminData, onExit }) {
           processing: { totalCentres: 28, utilizationRate: 72, avgRating: 4.6 },
           production: { totalTons: 15800, byCrop: [{crop:"Cassava",tons:8200},{crop:"Maize",tons:4100},{crop:"Yam",tons:3500}] },
           food: { securityIndex: 78, wasteReduction: 34 },
-          regional: { bestPerforming: "Edo South", growthRate: 12.5 }
+          regional: { title: "Edo South", growthRate: 12.5 }
         });
       } finally {
         setLoading(false);
@@ -1515,10 +1514,9 @@ function AdminDashboard({ adminData, onExit }) {
   if (!govtData) return <EmptyState icon={BarChart3} text="No government data available." />;
 
   const d = govtData;
-
   return (
     <div className="pb-6">
-      <div className="mx-4 mt-3 rounded-2xl p-4 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${BRAND.ink}, #0F1A12)` }}>
+      <div className="mx-4 mt-3 rounded-2xl p-4 relative overflow-hidden" style={{ background: linear-gradient(135deg, ${BRAND.ink}, #0F1A12) }}>
         <Landmark className="absolute -right-3 -bottom-3 opacity-10" size={90} color="#FFFFFF" />
         <div className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: BRAND.gold }} />
@@ -1532,7 +1530,7 @@ function AdminDashboard({ adminData, onExit }) {
         <GovtCard label="Registered Farmers" value={d.farmers?.totalFarmers?.toLocaleString() || "—"} icon={Users} color={BRAND.green} />
         <GovtCard label="Active Listings" value={d.market?.totalListings?.toLocaleString() || "—"} icon={Store} color={BRAND.blue} />
         <GovtCard label="Processing Centres" value={d.processing?.totalCentres?.toLocaleString() || "—"} icon={Wrench} color={BRAND.gold} />
-        <GovtCard label="Total Production" value={`${((d.production?.totalTons || 0) / 1000).toFixed(1)}k t`} icon={Package} color="#2C6E9E" />
+        <GovtCard label="Total Production" value={${((d.production?.totalTons || 0) / 1000).toFixed(1)}k t} icon={Package} color="#2C6E9E" />
       </div>
 
       <SectionTitle>State Breakdown</SectionTitle>
@@ -1545,7 +1543,7 @@ function AdminDashboard({ adminData, onExit }) {
             <div className="flex-1">
               <p className="text-xs font-semibold" style={{ color: BRAND.ink }}>{s.state || "Unspecified"}</p>
               <div className="w-full h-1.5 rounded-full mt-1" style={{ background: "#EFEFE8" }}>
-                <div className="h-1.5 rounded-full" style={{ width: `${Math.min(100, (s.count / Math.max(d.farmers?.totalFarmers || 1, 1)) * 100)}%`, background: BRAND.green }} />
+                <div className="h-1.5 rounded-full" style={{ width: ${Math.min(100, (s.count / Math.max(d.farmers?.totalFarmers || 1, 1)) * 100)}%, background: BRAND.green }} />
               </div>
             </div>
             <p className="text-xs font-bold" style={{ color: BRAND.ink }}>{s.count}</p>
@@ -1563,7 +1561,7 @@ function AdminDashboard({ adminData, onExit }) {
             </div>
             <div className="flex items-center gap-2 flex-1 mx-3">
               <div className="flex-1 h-2 rounded-full" style={{ background: "#EFEFE8" }}>
-                <div className="h-2 rounded-full" style={{ width: `${Math.min(100, (c.tons / Math.max(d.production?.totalTons || 1, 1)) * 100)}%`, background: BRAND.gold }} />
+                <div className="h-2 rounded-full" style={{ width: ${Math.min(100, (c.tons / Math.max(d.production?.totalTons || 1, 1)) * 100)}%, background: BRAND.gold }} />
               </div>
             </div>
             <p className="text-xs font-bold" style={{ color: BRAND.ink }}>{c.tons.toLocaleString()}t</p>
@@ -1577,26 +1575,25 @@ function AdminDashboard({ adminData, onExit }) {
             <ShieldCheck size={14} color={BRAND.green} />
             <span className="text-[10px] font-semibold" style={{ color: BRAND.ink }}>Food Security Index</span>
           </div>
-        <p className="text-xl font-bold agro-display" style={{ color: BRAND.green }}>{d.food?.securityIndex}</p>
-        <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>Waste reduced by {d.food?.wasteReduction}%</p>
+          <p className="text-xl font-bold agro-display" style={{ color: BRAND.green }}>{d.food?.securityIndex}</p>
+          <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>Waste reduced by {d.food?.wasteReduction}%</p>
+        </div>
+        <div className="rounded-2xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <TrendingUp size={14} color={BRAND.blue} />
+            <span className="text-[10px] font-semibold" style={{ color: BRAND.ink }}>Top Region</span>
+          </div>
+          <p className="text-sm font-bold agro-display" style={{ color: BRAND.ink }}>{d.regional?.title}</p>
+          <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>+{d.regional?.growthRate}%</p>
+        </div>
       </div>
-      <div className="rounded-2xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
-        <div className="flex items-center gap-1.5 mb-2">
-        <TrendingUp size={14} color={BRAND.blue} />
-        <span className="text-[10px] font-semibold" style={{ color: BRAND.ink }}>Top Region</span>
-     </div>
-      <p className="text-sm font-bold agro-display" style={{ color: BRAND.ink }}>{d.regional?.title}</p>
-      <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>+{d.regional?.growthRate}%</p>
     </div>
-  </div>
-</div>
-);
+  );
 }
 
 function GovtCard(props) {
   const { label, value, color } = props;
   const Icon = props.icon;
-
   return (
     <div className="rounded-xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
       <div className="flex items-center gap-1.5 mb-2">
