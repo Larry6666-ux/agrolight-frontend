@@ -1457,7 +1457,7 @@ function AdminDashboard({ adminData, onExit }) {
           return (
             <Card key={t.label}>
               <div className="flex items-center justify-between mb-1.5"><p className="text-[11px] font-semibold" style={{ color: BRAND.ink }}>{t.label}</p><p className="text-[10.5px]" style={{ color: "#9AA39B" }}>{t.value} / {t.target}</p></div>
-              <div className="w-full h-1.5 rounded-full" style={{ background: "#EFEFE8" }}><div className="h-1.5 rounded-full" style={{ width: ${pct}%, background: BRAND.green }} /></div>
+            <div className="w-full h-1.5 rounded-full" style={{ background: "#EFEFE8" }}><div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: BRAND.green }} /></div>
             </Card>
           );
         })}
