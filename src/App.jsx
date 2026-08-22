@@ -1607,3 +1607,5 @@ function GovtCard(props) {
     </div>
   );
 }
+
+export default App;
