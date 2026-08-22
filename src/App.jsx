@@ -1592,11 +1592,14 @@ function AdminDashboard({ adminData, onExit }) {
   );
 }
 
-function GovtCard({ label, value, icon: Icon, color }) {
+function GovtCard(props) {
+  const { label, value, color } = props;
+  const Icon = props.icon;
+
   return (
     <div className="rounded-xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
       <div className="flex items-center gap-1.5 mb-2">
-        <Icon size={14} color={color} />
+        {Icon && <Icon size={14} color={color} />}
         <span className="text-[9.5px] font-medium" style={{ color: "#9AA39B" }}>{label}</span>
       </div>
       <p className="text-lg font-bold agro-display" style={{ color }}>{value}</p>
