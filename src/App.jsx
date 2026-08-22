@@ -1530,7 +1530,7 @@ function GovernmentTab({ ctx }) {
         <GovtCard label="Registered Farmers" value={d.farmers?.totalFarmers?.toLocaleString() || "—"} icon={Users} color={BRAND.green} />
         <GovtCard label="Active Listings" value={d.market?.totalListings?.toLocaleString() || "—"} icon={Store} color={BRAND.blue} />
         <GovtCard label="Processing Centres" value={d.processing?.totalCentres?.toLocaleString() || "—"} icon={Wrench} color={BRAND.gold} />
-        <GovtCard label="Total Production" value={${((d.production?.totalTons || 0) / 1000).toFixed(1)}k t} icon={Package} color="#2C6E9E" />
+        <GovtCard label="Total Production" value={`${((d.production?.totalTons || 0) / 1000).toFixed(1)}k t`} icon={Package} color="#2C6E9E" />
       </div>
 
       <SectionTitle>State Breakdown</SectionTitle>
@@ -1543,7 +1543,7 @@ function GovernmentTab({ ctx }) {
             <div className="flex-1">
               <p className="text-xs font-semibold" style={{ color: BRAND.ink }}>{s.state || "Unspecified"}</p>
               <div className="w-full h-1.5 rounded-full mt-1" style={{ background: "#EFEFE8" }}>
-                <div className="h-1.5 rounded-full" style={{ width: ${Math.min(100, (s.count / Math.max(d.farmers?.totalFarmers || 1, 1)) * 100)}%, background: BRAND.green }} />
+                <div className="h-1.5 rounded-full" style={{ width: `${Math.min(100, (s.count / Math.max(d.farmers?.totalFarmers || 1, 1)) * 100)}%`, background: BRAND.green }} />
               </div>
             </div>
             <p className="text-xs font-bold" style={{ color: BRAND.ink }}>{s.count}</p>
@@ -1561,7 +1561,7 @@ function GovernmentTab({ ctx }) {
             </div>
             <div className="flex items-center gap-2 flex-1 mx-3">
               <div className="flex-1 h-2 rounded-full" style={{ background: "#EFEFE8" }}>
-                <div className="h-2 rounded-full" style={{ width: ${Math.min(100, (c.tons / Math.max(d.production?.totalTons || 1, 1)) * 100)}%, background: BRAND.gold }} />
+               <div className="h-2 rounded-full" style={{ width: `${Math.min(100, (c.tons / Math.max(d.production?.totalTons || 1, 1)) * 100)}%`, background: BRAND.gold }} />
               </div>
             </div>
             <p className="text-xs font-bold" style={{ color: BRAND.ink }}>{c.tons.toLocaleString()}t</p>
