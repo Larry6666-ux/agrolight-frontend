@@ -373,6 +373,7 @@ function WithdrawScreen({ ctx, goBack }) {
   );
 }
 function ReceiptScreen({ ctx, goBack, screen }) {
+  const { showToast } = ctx;
   const tx = screen.props?.tx;
   if (!tx) return <EmptyState icon={Receipt} text="Receipt not found." />;
 
@@ -398,6 +399,50 @@ function ReceiptScreen({ ctx, goBack, screen }) {
             <Receipt size={14} /> Download Receipt
           </button>
         </Card>
+      </div>
+    </div>
+  );
+}
+function ConnectScreen({ apiBase, setApiBase, status, errorMsg, onConnect }) {
+  const [input, setInput] = useState(apiBase);
+
+  return (
+    <div className="w-full min-h-screen flex items-center justify-center" style={{ background: BRAND.paper }}>
+      <div className="flex flex-col items-center gap-4 px-6 max-w-sm w-full">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: BRAND.greenSoft }}>
+          <Sprout size={32} color={BRAND.green} />
+        </div>
+        <div className="text-center">
+          <h1 className="text-xl font-bold agro-display" style={{ color: BRAND.green }}>AgroLight OS</h1>
+          <p className="text-xs mt-1" style={{ color: "#9AA39B" }}>Connect to your farm backend</p>
+        </div>
+
+        <div className="w-full flex flex-col gap-2.5">
+          <Label>Backend URL</Label>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="https://your-backend.com"
+            className="w-full rounded-lg px-3 py-2.5 text-xs border outline-none"
+            style={{ borderColor: "#EFEFE8", color: BRAND.ink }}
+          />
+          {errorMsg && (
+            <p className="text-[10.5px] text-center" style={{ color: "#B14545" }}>{errorMsg}</p>
+          )}
+          <PrimaryButton
+            onClick={() => onConnect(input)}
+            loading={status === "connecting"}
+            disabled={!input || status === "connecting"}
+            icon={status === "connecting" ? Loader2 : Zap}
+          >
+            {status === "connecting" ? "Connecting…" : "Connect"}
+          </PrimaryButton>
+        </div>
+
+        <p className="text-[10px] text-center" style={{ color: "#C7CFC8" }}>
+          Demo credentials are pre-filled.<br />
+          Farmer: 08160510275 / password123
+        </p>
       </div>
     </div>
   );
