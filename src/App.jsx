@@ -1516,7 +1516,7 @@ function GovernmentTab({ ctx }) {
   const d = govtData;
   return (
     <div className="pb-6">
-      <div className="mx-4 mt-3 rounded-2xl p-4 relative overflow-hidden" style={{ background: linear-gradient(135deg, ${BRAND.ink}, #0F1A12) }}>
+     <div className="mx-4 mt-3 rounded-2xl p-4 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${BRAND.ink}, #0F1A12)` }}>
         <Landmark className="absolute -right-3 -bottom-3 opacity-10" size={90} color="#FFFFFF" />
         <div className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: BRAND.gold }} />
