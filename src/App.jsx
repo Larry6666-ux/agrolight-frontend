@@ -80,6 +80,16 @@ async function apiFetch(base, token, path, options = {}) {
   return body;
 }
 
+function extractToken(result) {
+  if (!result) return null;
+  const token = result.accessToken || result.token || result.access_token || result.authToken;
+  if (token) return token;
+  if (result.data) {
+    return result.data.accessToken || result.data.token || result.data.access_token || result.data.authToken;
+  }
+  return null;
+}
+
 async function ensureSession(base, creds) {
   let result;
   try {
@@ -97,18 +107,23 @@ async function ensureSession(base, creds) {
         userType: creds.userType || "farmer",
       }),
     });
+    const otpCode = reg.devOtp || reg.otp || reg.code || reg.verificationCode;
     result = await apiFetch(base, null, "/api/auth/verify-otp", {
       method: "POST",
-      body: JSON.stringify({ phone: creds.phone, code: reg.devOtp }),
+      body: JSON.stringify({ phone: creds.phone, code: otpCode }),
     });
   }
-  // Handle backends that return "token" instead of "accessToken"
-  if (result && !result.accessToken && result.token) {
-    result.accessToken = result.token;
+  
+  const token = extractToken(result);
+  if (token) {
+    result = { ...result, accessToken: token };
   }
+  
+  console.log("[AgroLight] Login response:", result);
+  console.log("[AgroLight] Extracted token:", token ? token.slice(0, 20) + "..." : "NONE");
+  
   return result;
 }
-
 const DEFAULT_API_BASE = import.meta.env.VITE_DEFAULT_API_BASE || "https://agrolight-os-backend.vercel.app";
 
 export default function AgroLightPrototype() {
@@ -172,11 +187,14 @@ export default function AgroLightPrototype() {
     } catch { /* non-fatal, e.g. private browsing */ }
   }
 
-  const connect = async (base) => {
+   const connect = async (base) => {
     setConn({ status: "connecting" });
     setErrorMsg("");
     try {
       const login = await ensureSession(base, DEMO_FARMER);
+      console.log("[AgroLight] connect() login object:", login);
+      console.log("[AgroLight] connect() accessToken:", login?.accessToken ? login.accessToken.slice(0, 20) + "..." : "MISSING");
+      
       setApiBase(base);
       setToken(login.accessToken);
       setUser(login.user);
@@ -188,7 +206,6 @@ export default function AgroLightPrototype() {
       setErrorMsg(e.message || "Could not reach that backend.");
     }
   };
-
   const disconnect = async () => {
     try { window.localStorage.removeItem(SESSION_KEY); } catch { /* ignore */ }
     setToken(null);
