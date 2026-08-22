@@ -1577,17 +1577,16 @@ function AdminDashboard({ adminData, onExit }) {
             <ShieldCheck size={14} color={BRAND.green} />
             <span className="text-[10px] font-semibold" style={{ color: BRAND.ink }}>Food Security Index</span>
           </div>
-          <p className="text-xl font-bold agro-display" style={{ color: BRAND.green }}>{d.food?.securityIndex || 0}<span className="text-xs font-normal text-gray-400">/100</span></p>
-          <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>Waste reduced by {d.food?.wasteReduction || 0}%</p>
+        <p className="text-xl font-bold agro-display" style={{ color: BRAND.green }}>{d.food?.securityIndex}</p>
+        <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>Waste reduced by {d.food?.wasteReduction}%</p>
+      </div>
+      <div className="rounded-2xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
+        <div className="flex items-center gap-1.5 mb-2">
+          <TrendingUp size={14} color={BRAND.blue} />
+          <span className="text-[10px] font-semibold" style={{ color: BRAND.ink }}>Top Region</span>
         </div>
-        <div className="rounded-2xl p-3 bg-white border" style={{ borderColor: "#EFEFE8" }}>
-          <div className="flex items-center gap-1.5 mb-2">
-            <TrendingUp size={14} color={BRAND.blue} />
-            <span className="text-[10px] font-semibold" style={{ color: BRAND.ink }}>Top Region</span>
-          </div>
-          <p className="text-sm font-bold agro-display" style={{ color: BRAND.ink }}>{d.regional?.bestPerforming || "—"}</p>
-          <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>+{d.regional?.growthRate || 0}% growth</p>
-        </div>
+        <p className="text-sm font-bold agro-display" style={{ color: BRAND.ink }}>{d.regional?.title}</p>
+        <p className="text-[9px] mt-1" style={{ color: "#9AA39B" }}>+{d.regional?.growthRate}%</p>
       </div>
     </div>
   );
@@ -1604,7 +1603,3 @@ function GovtCard({ label, value, icon: Icon, color }) {
     </div>
   );
 }
-
-
-
-
