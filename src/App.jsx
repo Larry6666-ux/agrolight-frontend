@@ -67,7 +67,7 @@ async function apiFetch(base, token, path, options = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
-           ...(token ? { Authorization: token } : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
   });
@@ -90,23 +90,29 @@ function extractToken(result) {
   return null;
 }
 
-async function ensureSession(base, creds) {
-  let result;
+async function ensureSession(apiBase) {
   try {
-    result = await apiFetch(base, null, "/api/auth/login", {
+    const res = await fetch(`${apiBase}/auth/login`, {
       method: "POST",
-      body: JSON.stringify({ phone: creds.phone, password: creds.password }),
-    });
-  } catch (e) {
-    const reg = await apiFetch(base, null, "/api/auth/register", {
-      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        fullName: creds.fullName || "Demo User",
-        phone: creds.phone,
-        password: creds.password,
-        userType: creds.userType || "farmer",
+        email: "farmer@agrolight.com", // Use a valid registered user email
+        password: "password123"        // Use the corresponding password
       }),
     });
+    const data = await res.json();
+    
+    // Extract real JWT token returned by Express backend
+    const realToken = data.token || data.accessToken || data.data?.token;
+    if (realToken) {
+      localStorage.setItem("token", realToken);
+      return realToken;
+    }
+  } catch (err) {
+    console.error("Login failed:", err);
+  }
+  return null;
+}
     const otpCode = reg.devOtp || reg.otp || reg.code || reg.verificationCode;
     result = await apiFetch(base, null, "/api/auth/verify-otp", {
       method: "POST",
