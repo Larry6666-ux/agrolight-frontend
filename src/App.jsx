@@ -81,8 +81,9 @@ async function apiFetch(base, token, path, options = {}) {
 }
 
 async function ensureSession(base, creds) {
+  let result;
   try {
-    return await apiFetch(base, null, "/api/auth/login", {
+    result = await apiFetch(base, null, "/api/auth/login", {
       method: "POST",
       body: JSON.stringify({ phone: creds.phone, password: creds.password }),
     });
@@ -96,11 +97,16 @@ async function ensureSession(base, creds) {
         userType: creds.userType || "farmer",
       }),
     });
-    return apiFetch(base, null, "/api/auth/verify-otp", {
+    result = await apiFetch(base, null, "/api/auth/verify-otp", {
       method: "POST",
       body: JSON.stringify({ phone: creds.phone, code: reg.devOtp }),
     });
   }
+  // Handle backends that return "token" instead of "accessToken"
+  if (result && !result.accessToken && result.token) {
+    result.accessToken = result.token;
+  }
+  return result;
 }
 
 const DEFAULT_API_BASE = import.meta.env.VITE_DEFAULT_API_BASE || "https://agrolight-os-backend.vercel.app";
