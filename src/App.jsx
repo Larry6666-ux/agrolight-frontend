@@ -90,45 +90,46 @@ function extractToken(result) {
   return null;
 }
 
-async function ensureSession(apiBase) {
+function extractUser(result) {
+  if (!result) return null;
+  return result.user || result.data?.user || result.data || null;
+}
+
+async function ensureSession(base, creds) {
+  let result;
   try {
-    const res = await fetch(`${apiBase}/auth/login`, {
+    result = await apiFetch(base, null, "/api/auth/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: "farmer@agrolight.com", // Use a valid registered user email
-        password: "password123"        // Use the corresponding password
+        phone: creds.phone,
+        password: creds.password,
       }),
     });
-    const data = await res.json();
-    
-    // Extract real JWT token returned by Express backend
-    const realToken = data.token || data.accessToken || data.data?.token;
-    if (realToken) {
-      localStorage.setItem("token", realToken);
-      return realToken;
-    }
-  } catch (err) {
-    console.error("Login failed:", err);
-  }
-  return null;
-}
+  } catch (e) {
+    const reg = await apiFetch(base, null, "/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify({
+        fullName: creds.fullName || "Demo User",
+        phone: creds.phone,
+        password: creds.password,
+        userType: creds.userType || "farmer",
+      }),
+    });
     const otpCode = reg.devOtp || reg.otp || reg.code || reg.verificationCode;
     result = await apiFetch(base, null, "/api/auth/verify-otp", {
       method: "POST",
       body: JSON.stringify({ phone: creds.phone, code: otpCode }),
     });
   }
-  
+
   const token = extractToken(result);
-  if (token) {
-    result = { ...result, accessToken: token };
+  const user = extractUser(result);
+
+  if (!token) {
+    throw new Error("Backend did not return an auth token.");
   }
-  
-  console.log("[AgroLight] Login response:", result);
-  console.log("[AgroLight] Extracted token:", token ? token.slice(0, 20) + "..." : "NONE");
-  
-  return result;
+
+  return { accessToken: token, user };
 }
 const DEFAULT_API_BASE = import.meta.env.VITE_DEFAULT_API_BASE || "https://agrolight-os-backend.vercel.app";
 
