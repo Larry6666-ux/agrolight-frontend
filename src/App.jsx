@@ -236,8 +236,8 @@ export default function AgroLightPrototype() {
           apiFetch(base, tok, "/api/cold-storage/facilities"),
           apiFetch(base, tok, "/api/cold-storage/bookings/mine"),
           apiFetch(base, tok, "/api/marketplace/listings/mine"),
-          apiFetch(base, tok, "/api/finance/wallet/balance"),
-          apiFetch(base, tok, "/api/finance/wallet/history"),
+          apiFetch(base, tok, "/api/finance/wallet/balance").catch(() => ({ balance: 0 })),
+          apiFetch(base, tok, "/api/finance/wallet/history").catch(() => []),
           apiFetch(base, tok, "/api/notifications"),
         ]);
 
