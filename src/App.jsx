@@ -194,14 +194,11 @@ export default function AgroLightPrototype() {
     } catch { /* non-fatal, e.g. private browsing */ }
   }
 
-   const connect = async (base) => {
+   const connect = async (base, loginOverride = null) => {
     setConn({ status: "connecting" });
     setErrorMsg("");
     try {
-      const login = await ensureSession(base, DEMO_FARMER);
-      console.log("[AgroLight] connect() login object:", login);
-      console.log("[AgroLight] connect() accessToken:", login?.accessToken ? login.accessToken.slice(0, 20) + "..." : "MISSING");
-      
+      const login = loginOverride || await ensureSession(base, DEMO_FARMER);
       setApiBase(base);
       setToken(login.accessToken);
       setUser(login.user);
@@ -434,7 +431,99 @@ function ReceiptScreen({ ctx, goBack, screen }) {
   );
 }
 function ConnectScreen({ apiBase, setApiBase, status, errorMsg, onConnect }) {
-  const [input, setInput] = useState(apiBase);
+  const [mode, setMode] = useState("login");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState("form");
+  const [regData, setRegData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState("");
+
+  const submitLogin = async () => {
+    if (!phone || !password) return;
+    setLoading(true);
+    setLocalError("");
+    try {
+      const login = await apiFetch(apiBase, null, "/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ phone, password }),
+      });
+      onConnect(apiBase, login);
+    } catch (e) {
+      setLocalError(e.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitRegister = async () => {
+    if (!phone || !password || !fullName) return;
+    setLoading(true);
+    setLocalError("");
+    try {
+      const reg = await apiFetch(apiBase, null, "/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ fullName, phone, password, userType: "farmer" }),
+      });
+      setRegData(reg);
+      setStep("otp");
+    } catch (e) {
+      setLocalError(e.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyOtp = async () => {
+    if (!otp) return;
+    setLoading(true);
+    try {
+      const login = await apiFetch(apiBase, null, "/api/auth/verify-otp", {
+        method: "POST",
+        body: JSON.stringify({ phone, code: otp }),
+      });
+      onConnect(apiBase, login);
+    } catch (e) {
+      setLocalError(e.message || "OTP verification failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (step === "otp") {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center" style={{ background: BRAND.paper }}>
+        <div className="flex flex-col items-center gap-4 px-6 max-w-sm w-full">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: BRAND.greenSoft }}>
+            <ShieldCheck size={32} color={BRAND.green} />
+          </div>
+          <h1 className="text-xl font-bold agro-display" style={{ color: BRAND.green }}>Verify OTP</h1>
+          <p className="text-xs text-center" style={{ color: "#9AA39B" }}>
+            Enter the code sent to {phone}
+            {regData?.devOtp && <span className="block mt-1 font-mono text-sm" style={{ color: BRAND.gold }}>Dev OTP: {regData.devOtp}</span>}
+          </p>
+          <div className="w-full flex flex-col gap-2.5">
+            <input
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter 6-digit code"
+              className="w-full rounded-lg px-3 py-2.5 text-xs border outline-none text-center tracking-widest"
+              style={{ borderColor: "#EFEFE8", color: BRAND.ink }}
+            />
+            {localError && <p className="text-[10.5px] text-center" style={{ color: "#B14545" }}>{localError}</p>}
+            <PrimaryButton onClick={verifyOtp} loading={loading} disabled={!otp || loading}>
+              Verify & Login
+            </PrimaryButton>
+            <button onClick={() => setStep("form")} className="text-[10.5px] font-medium" style={{ color: BRAND.blue }}>
+              Back to {mode === "login" ? "login" : "registration"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center" style={{ background: BRAND.paper }}>
@@ -444,35 +533,80 @@ function ConnectScreen({ apiBase, setApiBase, status, errorMsg, onConnect }) {
         </div>
         <div className="text-center">
           <h1 className="text-xl font-bold agro-display" style={{ color: BRAND.green }}>AgroLight OS</h1>
-          <p className="text-xs mt-1" style={{ color: "#9AA39B" }}>Connect to your farm backend</p>
+          <p className="text-xs mt-1" style={{ color: "#9AA39B" }}>
+            {mode === "login" ? "Sign in to your farm account" : "Create a new farmer account"}
+          </p>
         </div>
 
         <div className="w-full flex flex-col gap-2.5">
           <Label>Backend URL</Label>
           <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
+            value={apiBase}
+            onChange={(e) => setApiBase(e.target.value)}
             placeholder="https://your-backend.com"
             className="w-full rounded-lg px-3 py-2.5 text-xs border outline-none"
             style={{ borderColor: "#EFEFE8", color: BRAND.ink }}
           />
-          {errorMsg && (
-            <p className="text-[10.5px] text-center" style={{ color: "#B14545" }}>{errorMsg}</p>
-          )}
-          <PrimaryButton
-            onClick={() => onConnect(input)}
-            loading={status === "connecting"}
-            disabled={!input || status === "connecting"}
-            icon={status === "connecting" ? Loader2 : Zap}
-          >
-            {status === "connecting" ? "Connecting…" : "Connect"}
-          </PrimaryButton>
-        </div>
 
-        <p className="text-[10px] text-center" style={{ color: "#C7CFC8" }}>
-          Demo credentials are pre-filled.<br />
-          Farmer: 08160510275 / password123
-        </p>
+          {mode === "register" && (
+            <div className="mt-1">
+              <Label>Full Name</Label>
+              <input
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Joshua Amos"
+                className="w-full rounded-lg px-3 py-2.5 text-xs border outline-none"
+                style={{ borderColor: "#EFEFE8", color: BRAND.ink }}
+              />
+            </div>
+          )}
+
+          <div className="mt-1">
+            <Label>Phone Number</Label>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="08160510275"
+              className="w-full rounded-lg px-3 py-2.5 text-xs border outline-none"
+              style={{ borderColor: "#EFEFE8", color: BRAND.ink }}
+            />
+          </div>
+
+          <div className="mt-1">
+            <Label>Password</Label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full rounded-lg px-3 py-2.5 text-xs border outline-none"
+              style={{ borderColor: "#EFEFE8", color: BRAND.ink }}
+            />
+          </div>
+
+          {errorMsg && <p className="text-[10.5px] text-center" style={{ color: "#B14545" }}>{errorMsg}</p>}
+          {localError && <p className="text-[10.5px] text-center" style={{ color: "#B14545" }}>{localError}</p>}
+
+          <div className="mt-2">
+            {mode === "login" ? (
+              <PrimaryButton onClick={submitLogin} loading={loading} disabled={!phone || !password || loading}>
+                Sign In
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton onClick={submitRegister} loading={loading} disabled={!phone || !password || !fullName || loading}>
+                Create Account
+              </PrimaryButton>
+            )}
+          </div>
+
+          <p className="text-[10.5px] text-center mt-2">
+            {mode === "login" ? (
+              <>Don't have an account? <button onClick={() => { setMode("register"); setLocalError(""); }} className="font-semibold" style={{ color: BRAND.green }}>Register</button></>
+            ) : (
+              <>Already have an account? <button onClick={() => { setMode("login"); setLocalError(""); }} className="font-semibold" style={{ color: BRAND.green }}>Sign In</button></>
+            )}
+          </p>
+        </div>
       </div>
     </div>
   );
