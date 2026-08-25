@@ -952,13 +952,16 @@ function ProfileTab({ ctx, onAdmin, onDisconnect }) {
         </Card>
       </div>
 
-      <SectionTitle>Platform</SectionTitle>
+     <SectionTitle>Platform</SectionTitle>
       <div className="px-4 flex flex-col gap-2">
-      {user?.userType === "admin" && (
-        <Card onClick={onAdmin} className="flex items-center gap-3"><BarChart3 size={17} color={BRAND.blue} /><span className="text-xs font-semibold flex-1" style={{ color: BRAND.ink }}>View Admin Dashboard</span><ChevronRight size={16} color="#C7CFC8" /></Card>
-      )}
+        {user?.userType === "admin" && (
+          <Card onClick={onAdmin} className="flex items-center gap-3"><BarChart3 size={17} color={BRAND.blue} /><span className="text-xs font-semibold flex-1" style={{ color: BRAND.ink }}>View Admin Dashboard</span><ChevronRight size={16} color="#C7CFC8" /></Card>
+        )}
+        <Card onClick={onDisconnect} className="flex items-center gap-3"><LogOut size={17} color="#B14545" /><span className="text-xs font-semibold flex-1" style={{ color: "#B14545" }}>Log Out</span></Card>
+      </div>
+
       <div className="px-4 mt-5 text-center">
-        <p className="text-[10px]" style={{ color: "#C7CFC8" }}>Connected to {apiBase}</p>
+        <p className="text-[10px]" style={{ color: "#C7CFC8" }}>Connected to AgroLight OS</p>
         <p className="text-[10px] mt-0.5" style={{ color: "#C7CFC8" }}>AgroLight OS · Live API build</p>
       </div>
     </div>
