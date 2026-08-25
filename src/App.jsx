@@ -539,15 +539,8 @@ function ConnectScreen({ apiBase, setApiBase, status, errorMsg, onConnect }) {
         </div>
 
         <div className="w-full flex flex-col gap-2.5">
-          <Label>Backend URL</Label>
-          <input
-            value={apiBase}
-            onChange={(e) => setApiBase(e.target.value)}
-            placeholder="https://your-backend.com"
-            className="w-full rounded-lg px-3 py-2.5 text-xs border outline-none"
-            style={{ borderColor: "#EFEFE8", color: BRAND.ink }}
-          />
-
+         
+          
           {mode === "register" && (
             <div className="mt-1">
               <Label>Full Name</Label>
